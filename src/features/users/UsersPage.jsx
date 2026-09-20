@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { date } from "../../components/Formatters";
 import { StatusBadge } from "../../components/StatusBadge";
+import { ResponsiveSelect } from "../../components/ResponsiveSelect";
 import { fetchUsers, updateUserRole } from "./usersSlice";
 
 export function UsersPage() {
@@ -48,18 +49,18 @@ export function UsersPage() {
 
   return (
     <div className="grid gap-6">
-      <section className="grid gap-4 md:grid-cols-3">
-        <article className="panel p-5">
-          <span className="text-sm font-extrabold text-muted">Total Users</span>
-          <strong className="mt-3 block text-3xl font-extrabold tracking-normal">{items.length}</strong>
+      <section className="grid grid-cols-3 gap-2 sm:gap-4">
+        <article className="panel grid min-h-24 min-w-0 place-content-center p-2 text-center sm:min-h-28 sm:p-5">
+          <span className="text-[11px] font-extrabold leading-tight text-muted sm:text-sm">Total Users</span>
+          <strong className="mt-2 block text-2xl font-extrabold tracking-normal sm:mt-3 sm:text-3xl">{items.length}</strong>
         </article>
-        <article className="panel p-5">
-          <span className="text-sm font-extrabold text-muted">Admins</span>
-          <strong className="mt-3 block text-3xl font-extrabold tracking-normal">{adminCount}</strong>
+        <article className="panel grid min-h-24 min-w-0 place-content-center p-2 text-center sm:min-h-28 sm:p-5">
+          <span className="text-[11px] font-extrabold leading-tight text-muted sm:text-sm">Admins</span>
+          <strong className="mt-2 block text-2xl font-extrabold tracking-normal sm:mt-3 sm:text-3xl">{adminCount}</strong>
         </article>
-        <article className="panel p-5">
-          <span className="text-sm font-extrabold text-muted">Customers</span>
-          <strong className="mt-3 block text-3xl font-extrabold tracking-normal">{customerCount}</strong>
+        <article className="panel grid min-h-24 min-w-0 place-content-center p-2 text-center sm:min-h-28 sm:p-5">
+          <span className="text-[11px] font-extrabold leading-tight text-muted sm:text-sm">Customers</span>
+          <strong className="mt-2 block text-2xl font-extrabold tracking-normal sm:mt-3 sm:text-3xl">{customerCount}</strong>
         </article>
       </section>
 
@@ -83,7 +84,42 @@ export function UsersPage() {
 
       {error ? <p className="font-bold text-red-700">{error}</p> : null}
 
-      <section className="panel overflow-hidden">
+      <section className="grid gap-3 md:hidden">
+        {filteredUsers.map((user) => {
+          const isCurrentUser = currentUser?.id === user.id;
+
+          return (
+            <article className="panel min-w-0 p-4" key={user.id}>
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h4 className="truncate font-extrabold">{user.name}</h4>
+                  <p className="break-all text-sm font-semibold text-muted">{user.email}</p>
+                </div>
+                <StatusBadge tone={user.role === "admin" ? "warning" : "default"}>{user.role}</StatusBadge>
+              </div>
+
+              <div className="mt-4 grid gap-3 border-t border-line pt-4">
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="font-bold text-muted">Created</span>
+                  <span className="text-right font-semibold">{date(user.created_at)}</span>
+                </div>
+                <label className="label">
+                  Manage access
+                  <ResponsiveSelect disabled={isCurrentUser} onChange={(event) => requestRoleChange(user, event.target.value)} value={user.role} options={[{ label: "Customer", value: "customer" }, { label: "Admin", value: "admin" }]} />
+                </label>
+                {isCurrentUser ? (
+                  <p className="text-xs font-bold text-muted">Current signed-in account</p>
+                ) : null}
+              </div>
+            </article>
+          );
+        })}
+        {!filteredUsers.length ? (
+          <div className="panel p-5 text-center font-bold text-muted">No users match your search.</div>
+        ) : null}
+      </section>
+
+      <section className="panel hidden overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -110,15 +146,7 @@ export function UsersPage() {
                       <StatusBadge tone={user.role === "admin" ? "warning" : "default"}>{user.role}</StatusBadge>
                     </td>
                     <td className="border-t border-line px-5 py-4">
-                      <select
-                        className="field min-w-36"
-                        disabled={isCurrentUser}
-                        onChange={(event) => requestRoleChange(user, event.target.value)}
-                        value={user.role}
-                      >
-                        <option value="customer">Customer</option>
-                        <option value="admin">Admin</option>
-                      </select>
+                      <ResponsiveSelect disabled={isCurrentUser} onChange={(event) => requestRoleChange(user, event.target.value)} value={user.role} options={[{ label: "Customer", value: "customer" }, { label: "Admin", value: "admin" }]} />
                       {isCurrentUser ? (
                         <p className="mt-2 text-xs font-bold text-muted">Current signed-in account</p>
                       ) : null}

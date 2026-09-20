@@ -20,7 +20,14 @@ export function Layout({
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => window.matchMedia("(min-width: 1024px)").matches
+  );
+
+  const changeView = (view) => {
+    onViewChange(view);
+    if (window.matchMedia("(max-width: 1023px)").matches) setSidebarOpen(false);
+  };
 
   const navButtonClass = (key) => `
     min-h-10 rounded-md px-3 py-2 text-sm font-bold
@@ -34,19 +41,39 @@ export function Layout({
 
   return (
     <main className="h-screen overflow-hidden">
-      {/* Mobile Menu Button */}
-      <button
-        type="button"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed left-4 top-4 z-50 rounded-md bg-nav p-2 text-white shadow-lg lg:hidden"
-      >
-        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
+      {sidebarOpen ? (
+        <button
+          aria-label="Close navigation"
+          className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          type="button"
+        />
+      ) : null}
+      {/* Mobile Header */}
+      <header className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-sm backdrop-blur lg:hidden">
+        <div className="min-w-0">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">
+            Threadlux Admin
+          </p>
+          <p className="truncate text-lg font-extrabold text-ink">
+            {headings[activeView]?.[1]}
+          </p>
+        </div>
+        <button
+          aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={sidebarOpen}
+          type="button"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="ml-4 grid h-10 w-10 shrink-0 place-items-center rounded-md bg-nav text-white shadow-lg"
+        >
+          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </header>
 
       {/* Sidebar */}
       <aside
         className={`
-          fixed left-0 top-0 z-40 flex h-screen flex-col
+          fixed left-0 top-0 z-40 flex h-screen flex-col pt-16 lg:pt-0
           bg-nav text-white transition-all duration-300
           ${sidebarOpen ? "w-[240px]" : "w-[72px]"}
           ${
@@ -61,11 +88,11 @@ export function Layout({
           {sidebarOpen && (
             <div>
               <p className="mb-1 text-xs font-extrabold uppercase text-emerald-200">
-                E-Commerce
+                Threadlux
               </p>
-              <h1 className="text-3xl font-extrabold">
-                Admin
-              </h1>
+              <h6 className="text-xl font-extrabold">
+                Admin-Panel
+              </h6>
             </div>
           )}
 
@@ -85,7 +112,7 @@ export function Layout({
         >
           {/* Dashboard */}
           <button
-            onClick={() => onViewChange("dashboard")}
+            onClick={() => changeView("dashboard")}
             className={navButtonClass("dashboard")}
           >
             {sidebarOpen ? "Dashboard" : "D"}
@@ -99,7 +126,7 @@ export function Layout({
           )}
 
           <button
-            onClick={() => onViewChange("products")}
+            onClick={() => changeView("products")}
             className={navButtonClass("products")}
           >
             {sidebarOpen ? "Products" : "P"}
@@ -113,7 +140,7 @@ export function Layout({
           )}
 
           <button
-            onClick={() => onViewChange("orders")}
+            onClick={() => changeView("orders")}
             className={navButtonClass("orders")}
           >
             {sidebarOpen ? "Orders" : "O"}
@@ -127,7 +154,7 @@ export function Layout({
           )}
 
           <button
-            onClick={() => onViewChange("users")}
+            onClick={() => changeView("users")}
             className={navButtonClass("users")}
           >
             {sidebarOpen ? "Users" : "U"}
@@ -143,7 +170,7 @@ export function Layout({
               )}
 
               <button
-                onClick={() => onViewChange("admins")}
+                onClick={() => changeView("admins")}
                 className={navButtonClass("admins")}
               >
                 {sidebarOpen ? "Admin Accounts" : "A"}
@@ -181,7 +208,7 @@ export function Layout({
       {/* Main Content */}
       <section
         className={`
-          h-screen overflow-y-auto p-5 transition-all duration-300 lg:p-7
+          h-screen overflow-x-hidden overflow-y-auto px-4 pb-5 pt-20 transition-all duration-300 sm:px-5 lg:p-7
           ${sidebarOpen ? "lg:ml-[240px]" : "lg:ml-[72px]"}
         `}
       >

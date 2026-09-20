@@ -26,11 +26,14 @@ export function DashboardPage() {
 
   return (
     <div className="grid gap-6">
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <section className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2 xl:grid-cols-5">
         {metrics.map(([label, value]) => (
-          <article className="panel grid min-h-28 content-between p-5" key={label}>
-            <span className="text-sm font-extrabold text-muted">{label}</span>
-            <strong className="text-3xl font-extrabold tracking-normal">{value}</strong>
+          <article
+            className={`panel grid min-h-24 min-w-0 place-content-center overflow-hidden p-2 text-center sm:min-h-28 sm:p-5 xl:content-between xl:text-left ${label === "Revenue" ? "col-span-2 xl:col-span-1" : ""}`}
+            key={label}
+          >
+            <span className="text-[11px] font-extrabold leading-tight text-muted sm:text-sm">{label}</span>
+            <strong className="mt-2 max-w-full truncate text-2xl font-extrabold tracking-normal sm:text-3xl xl:mt-0">{value}</strong>
           </article>
         ))}
       </section>

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { money } from "../../components/Formatters";
 import { StatusBadge } from "../../components/StatusBadge";
+import { ResponsiveSelect } from "../../components/ResponsiveSelect";
 import { deactivateProduct, deleteProduct, fetchProducts, saveProduct } from "./productsSlice";
 
 const emptyProduct = {
@@ -288,44 +289,19 @@ export function ProductsPage() {
           </label>
           <label className="label">
             Category
-            <select className="field" name="category" onChange={handleFilterChange} value={filters.category}>
-              <option value="all">All categories</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
+            <ResponsiveSelect name="category" onChange={handleFilterChange} value={filters.category} options={[{ label: "All categories", value: "all" }, ...categories.map((category) => ({ label: category, value: category }))]} />
           </label>
           <label className="label">
             Status
-            <select className="field" name="status" onChange={handleFilterChange} value={filters.status}>
-              {productStatusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <ResponsiveSelect name="status" onChange={handleFilterChange} options={productStatusOptions} value={filters.status} />
           </label>
           <label className="label">
             Stock
-            <select className="field" name="stock" onChange={handleFilterChange} value={filters.stock}>
-              {stockOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <ResponsiveSelect name="stock" onChange={handleFilterChange} options={stockOptions} value={filters.stock} />
           </label>
           <label className="label">
             Sort
-            <select className="field" name="sort" onChange={handleFilterChange} value={filters.sort}>
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <ResponsiveSelect name="sort" onChange={handleFilterChange} options={sortOptions} value={filters.sort} />
           </label>
           <button
             className="btn-ghost self-end"
@@ -343,12 +319,12 @@ export function ProductsPage() {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filteredItems.map((product) => (
-          <article className="panel overflow-hidden" key={product.id}>
+          <article className="panel min-w-0 overflow-hidden" key={product.id}>
             <img className="aspect-[16/10] w-full bg-slate-200 object-cover" src={product.image_urls?.[0] || product.image_url} alt={product.name} />
             <div className="grid gap-3 p-4">
-              <div>
-                <h3 className="text-lg font-extrabold tracking-normal">{product.name}</h3>
-                <p className="text-sm font-bold text-muted">
+              <div className="min-w-0">
+                <h3 className="break-words text-lg font-extrabold tracking-normal">{product.name}</h3>
+                <p className="break-words text-sm font-bold text-muted">
                   {product.category || "Uncategorized"} / {money(product.price)} / {product.stock || 0} in stock
                 </p>
               </div>

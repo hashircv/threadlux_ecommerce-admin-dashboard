@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { date, money } from "../../components/Formatters";
+import { ResponsiveSelect } from "../../components/ResponsiveSelect";
 import { fetchOrders, updateOrderStatus } from "./ordersSlice";
 
 const statuses = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
@@ -92,14 +93,7 @@ export function OrdersPage() {
           </label>
           <label className="label">
             Status
-            <select className="field" name="status" onChange={handleFilterChange} value={filters.status}>
-              <option value="all">All statuses</option>
-              {statuses.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+            <ResponsiveSelect name="status" onChange={handleFilterChange} value={filters.status} options={[{ label: "All statuses", value: "all" }, ...statuses.map((item) => ({ label: item, value: item }))]} />
           </label>
           <label className="label">
             From
@@ -119,13 +113,7 @@ export function OrdersPage() {
           </label>
           <label className="label">
             Sort
-            <select className="field" name="sort" onChange={handleFilterChange} value={filters.sort}>
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <ResponsiveSelect name="sort" onChange={handleFilterChange} options={sortOptions} value={filters.sort} />
           </label>
           <button
             className="btn-ghost self-end"
@@ -142,27 +130,21 @@ export function OrdersPage() {
       </section>
 
       {filteredItems.map((order) => (
-        <article className="panel grid gap-4 p-5" key={order.id}>
+        <article className="panel grid min-w-0 gap-4 overflow-hidden p-4 sm:p-5" key={order.id}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
+            <div className="min-w-0">
               <h3 className="text-lg font-extrabold tracking-normal">Order #{order.id}</h3>
-              <p className="text-sm font-bold text-muted">
+              <p className="break-words text-sm font-bold text-muted">
                 {order.customer_name} / {order.customer_email} / {date(order.created_at)} / {money(order.total_amount)}
               </p>
             </div>
             <label className="label min-w-44">
               Status
-              <select
-                className="field"
-                value={order.status}
+              <ResponsiveSelect
                 onChange={(event) => dispatch(updateOrderStatus({ id: order.id, status: event.target.value }))}
-              >
-                {statuses.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+                options={statuses.map((item) => ({ label: item, value: item }))}
+                value={order.status}
+              />
             </label>
           </div>
           <div className="grid gap-2 text-sm font-semibold text-muted">

@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiRequest } from "../../app/api";
+import { clearAdminSession, readAdminSession, saveAdminSession } from "../../app/authSession";
 
-const savedUser = JSON.parse(localStorage.getItem("adminUser") || "null");
-const savedToken = localStorage.getItem("adminToken");
+const savedSession = readAdminSession();
 
 export const loginAdmin = createAsyncThunk("auth/loginAdmin", async (credentials) => {
   const result = await apiRequest("/auth/login", {
@@ -23,8 +23,8 @@ export const loginAdmin = createAsyncThunk("auth/loginAdmin", async (credentials
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: savedUser,
-    token: savedToken,
+    user: savedSession.user,
+    token: savedSession.token,
     status: "idle",
     error: "",
   },
@@ -34,8 +34,7 @@ const authSlice = createSlice({
       state.token = null;
       state.status = "idle";
       state.error = "";
-      localStorage.removeItem("adminUser");
-      localStorage.removeItem("adminToken");
+      clearAdminSession();
     },
   },
   extraReducers: (builder) => {
@@ -48,8 +47,7 @@ const authSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
-        localStorage.setItem("adminUser", JSON.stringify(action.payload.user));
-        localStorage.setItem("adminToken", action.payload.token);
+        saveAdminSession(action.payload.token, action.payload.user);
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.status = "failed";
